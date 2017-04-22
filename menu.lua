@@ -59,7 +59,7 @@ function scene:create( event )
     local sound_on = widget.newButton( 
         {
             left = swidth/2.2,
-            top = sheight/1.03, 
+            top = sheight/1.1, 
             defaultFile = "volume.png",
             width = 32,
             height = 32,
@@ -72,7 +72,7 @@ function scene:create( event )
     local sound_off = widget.newButton(
          {
             left = swidth/2.2,
-            top = sheight/1.03, 
+            top = sheight/1.1, 
             defaultFile = "volumeoff.png",
             width = 32,
             height = 32,

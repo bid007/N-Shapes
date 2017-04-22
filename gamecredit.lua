@@ -20,7 +20,7 @@ function scene:create( event )
     local nshapes_text = display.newText( sceneGroup, "N-Shapes", swidth/2, sheight/2, native.systemFontBold, 30)
     nshapes_text:setFillColor( 0.8, 0.8, 0.8 )
     --Copy right with nilcodes
-    local nilcodes_text = display.newText( sceneGroup, "© NILCODES CREATION", swidth/2, sheight/1.01, native.systemFontBold, 15)
+    local nilcodes_text = display.newText( sceneGroup, "© NILCODES CREATION", swidth/2, sheight/1.1, native.systemFontBold, 15)
     nilcodes_text:setFillColor( 0.8, 0.8, 0.8 )
 end
  
