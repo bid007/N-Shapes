@@ -9,7 +9,8 @@ local widget = require("widget")
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function play_event(event)
-    print("Okay lets play");
+    local options = {effect = "fade", time = 200}
+    composer.gotoScene("gamelogic", options)
 end
 
 function sound_on_event(event)
