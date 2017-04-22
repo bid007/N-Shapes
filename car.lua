@@ -11,10 +11,11 @@ function Car:new (o)    --constructor
 end
 
 function Car:spawn()
-	self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
-	self.shape:scale( 0.1, 0.1 )
-	self.shape.tag = self.tag
-	self.shape.pp = self
+	print("Not Implemented")
+end
+
+function Car:handleCustomTap()
+	print("Not Implemented")
 end
 
 return Car

@@ -2,6 +2,9 @@ local composer = require( "composer")
 local scene = composer.newScene()
 local widget = require("widget")
 local car = require("car")
+local physics = require("physics")
+physics.start()
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -32,8 +35,8 @@ local car = require("car")
     }
  }
  --Left and right car initial postions
- local left_pos_index = 0
- local right_pos_index = 1
+ local left_pos_index = false
+ local right_pos_index = true
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function pause_event(event)
@@ -43,23 +46,79 @@ function pause_event(event)
 end
 
 function right_road_event(event)
-    print("Right road tapped")
     right_pos_index = not right_pos_index
     if(right_pos_index) then
         --Position 1
+        local event_dict = {
+            name = "right_car_tap",
+            xPos = right_car_pos[1].xPos,
+            yPos = right_car_pos[1].yPos,
+        }
+        Runtime:dispatchEvent( event_dict)
+
     else
         --Position 0
+        local event_dict = {
+            name = "right_car_tap",
+            xPos = right_car_pos[0].xPos,
+            yPos = right_car_pos[0].yPos,
+        }
+        Runtime:dispatchEvent( event_dict)
     end
 end
 
 function left_road_event(event)
-    print("left road tapped")
     left_pos_index = not left_pos_index
     if(left_pos_index) then
         --Position 1
+        local event_dict = {
+            name = "left_car_tap",
+            xPos = left_car_pos[1].xPos,
+            yPos = left_car_pos[1].yPos,
+        }
+        -- game_scope.left_road:dispatchEvent( event )
+        Runtime:dispatchEvent( event_dict)
     else
         --Position 0
+        local event_dict = {
+            name = "left_car_tap",
+            xPos = left_car_pos[0].xPos,
+            yPos = left_car_pos[0].yPos
+        }
+        -- game_scope.left_road:dispatchEvent( event )
+        Runtime:dispatchEvent(event_dict)
     end
+end
+--------------------------------------------------------------------------------------
+--Car inheritence methods 
+local left_car = car:new(left_car_pos[0])
+
+function left_car:spawn()
+    self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
+    self.shape:scale( 0.1, 0.1 )
+    self.shape.tag = self.tag
+    self.shape.pp = self
+    physics.addBody( self.shape, "kinematic")
+
+    local function event_listener(event)
+        transition.to( self.shape, {time=200, x = event.xPos, y = event.yPos})
+    end
+    Runtime:addEventListener( "left_car_tap", event_listener)
+end
+
+local right_car = car:new(right_car_pos[1])
+
+function right_car:spawn()
+    self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
+    self.shape:scale( 0.1, 0.1 )
+    self.shape.tag = self.tag
+    self.shape.pp = self
+    physics.addBody( self.shape, "kinematic")
+
+    local function event_listener(event)
+        transition.to( self.shape, {time=200, x = event.xPos, y = event.yPos})
+    end
+    Runtime:addEventListener( "right_car_tap", event_listener)
 end
 
 -- -----------------------------------------------------------------------------------
@@ -104,16 +163,18 @@ function scene:create( event )
     score.anchorX = 0
     game_scope.score = score
     --Player cars
+
     --Left car
-    local left_car = car:new(left_car_pos[left_pos_index])
-    game_scope.left_car = left_car
-    left_car:spawn()
-    sceneGroup:insert(left_car.shape)
+    local left_car_object = left_car:new()
+    game_scope.left_car_object = left_car_object
+    left_car_object:spawn()
+    sceneGroup:insert(left_car_object.shape)
+
     --Right car
-    local right_car = car:new(right_car_pos[right_pos_index])
-    game_scope.right_car = right_car
-    right_car:spawn()
-    sceneGroup:insert(right_car.shape)
+    local right_car_object = right_car:new()
+    game_scope.right_car_object = right_car_object
+    right_car_object:spawn()
+    sceneGroup:insert(right_car_object.shape)
 end
  
  
