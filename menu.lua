@@ -10,13 +10,23 @@ local widget = require("widget")
 -- Scene event functions
 function play_event(event)
     print("Okay lets play");
-    return true
 end
 
 function sound_on_event(event)
     -- body
     sound_on = not sound_on
-    
+
+    if(sound_on) then
+        menu_scope.sound_on.isVisible = true
+        menu_scope.sound_on.isEnabled = true
+        menu_scope.sound_off.isVisible = false
+        menu_scope.sound_off.isEnabled = false
+    else
+        menu_scope.sound_on.isVisible = false
+        menu_scope.sound_on.isEnabled = false
+        menu_scope.sound_off.isVisible = true
+        menu_scope.sound_off.isEnabled = true
+    end
 end
 -- -----------------------------------------------------------------------------------
  
@@ -26,7 +36,7 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     --set background color
-    display.setDefault("background", 247/255, 220/255, 111/255 )
+    display.setDefault("background", 242/255, 109/255, 33/255)
     --N Shapes text
     local nshapes_text = display.newText( sceneGroup, "N-Shapes", swidth/2, sheight/9, native.systemFontBold, 30)
     nshapes_text:setFillColor( 0.1, 0.1, 0.1)
@@ -44,7 +54,34 @@ function scene:create( event )
     play:addEventListener( "tap", play_event )
     sceneGroup:insert(play)
     menu_scope.play_button = play
-    --Sound on/off button x = w/2.2, y = h/1.03
+    --Sound on/off button 
+    local sound_on = widget.newButton( 
+        {
+            left = swidth/2.2,
+            top = sheight/1.03, 
+            defaultFile = "volume.png",
+            width = 32,
+            height = 32,
+        }
+    )     
+    menu_scope.sound_on = sound_on
+    sound_on:addEventListener( "tap", sound_on_event )
+    sceneGroup:insert(sound_on)
+
+    local sound_off = widget.newButton(
+         {
+            left = swidth/2.2,
+            top = sheight/1.03, 
+            defaultFile = "volumeoff.png",
+            width = 32,
+            height = 32,
+        }
+    )
+    menu_scope.sound_off = sound_off
+    sound_off.isVisible = false
+    sound_off.isEnabled = false
+    sound_off:addEventListener( "tap", sound_on_event )
+    sceneGroup:insert(sound_off)
 end
  
  
