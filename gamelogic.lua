@@ -19,6 +19,9 @@ end
  
 -- show()
 function scene:show( event )
+
+    local sceneGroup = self.view
+    local phase = event.phase
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
