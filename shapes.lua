@@ -13,20 +13,25 @@ end
 function Shapes:spawn()
 	local type_obtained = self.type
 	if (type_obtained == "circle") then
-		self.shape = display.newImage(game_sprites, math(1,4))
+		self.shape = display.newImage(game_sprites, math.random(1,4))
 	elseif(type_obtained == "round_rect") then
-		self.shape = display.newImage(game_sprites, math(5,8))
+		self.shape = display.newImage(game_sprites, math.random(5,8))
 	elseif(type_obtained == "rect") then
-		self.shape = display.newImage(game_sprites, math(9,12))
+		self.shape = display.newImage(game_sprites, math.random(9,12))
 	elseif(type_obtained == "pentagon") then
-		self.shape = display.newImage(game_sprites, math(13,16))
+		self.shape = display.newImage(game_sprites, math.random(13,16))
 	elseif(type_obtained == "hexagon") then
-		self.shape = display.newImage(game_sprites, math(17,20))
+		self.shape = display.newImage(game_sprites, math.random(17,20))
 	elseif(type_obtained == "triangle") then
-		self.shape = display.newImage(game_sprites, math(21, 24))
+		self.shape = display.newImage(game_sprites, math.random(21, 24))
 	end
 	self.shape.pp = self --pointer to parent
 	self.shape.tag = self.tag
+	self.shape:scale( 0.4, 0.4 )
+	self.shape.x = self.xPos
+	self.shape.y = self.yPos
+	self.shape.anchorX = 0
+	self.shape.anchorY = 0
 	physics.addBody(self.shape, "dynamic")
 end
 
@@ -45,5 +50,5 @@ function Shapes:handle_collision_with_other()
 	self.shape:addEventListener("collision", collision)
 end
 
-return Shape
+return Shapes
 

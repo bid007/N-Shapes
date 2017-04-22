@@ -3,8 +3,10 @@ local scene = composer.newScene()
 local widget = require("widget")
 local car = require("car")
 local physics = require("physics")
+local shapes = require("shapes")
 physics.start()
-
+physics.setGravity( 0, 9.8 )
+-- physics.setDrawMode( "debug" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -37,6 +39,10 @@ physics.start()
  --Left and right car initial postions
  local left_pos_index = false
  local right_pos_index = true
+
+--Time Counter
+local time_counter = 0 
+local generate_time = 2
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function pause_event(event)
@@ -95,7 +101,6 @@ local left_car = car:new(left_car_pos[0])
 
 function left_car:spawn()
     self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
-    self.shape:scale( 0.1, 0.1 )
     self.shape.tag = self.tag
     self.shape.pp = self
     physics.addBody( self.shape, "kinematic")
@@ -110,7 +115,6 @@ local right_car = car:new(right_car_pos[1])
 
 function right_car:spawn()
     self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
-    self.shape:scale( 0.1, 0.1 )
     self.shape.tag = self.tag
     self.shape.pp = self
     physics.addBody( self.shape, "kinematic")
@@ -136,13 +140,14 @@ function scene:create( event )
     left_road.y = -60
     game_scope.left_road = left_road
     left_road:addEventListener( "tap", left_road_event)
-    --Right road image
+    -- --Right road image
     local right_road = display.newImageRect( sceneGroup, "right.png", road_w, road_h)
     right_road.anchorX = 0
     right_road.anchorY = 0
     right_road.y = -60
     right_road.x = road_w
     game_scope.right_road = right_road
+    right_road:toBack()
     right_road:addEventListener( "tap", right_road_event)
     --Pause button
     local pause = widget.newButton(
@@ -157,14 +162,14 @@ function scene:create( event )
     game_scope.pause = pause
     pause:addEventListener( "tap", pause_event)
     sceneGroup:insert(pause)
-    --score value
+    -- --score value
     local score = display.newText( sceneGroup, 0, 10, -45, native.systemFontBold, 28)
     score.anchorY = 0
     score.anchorX = 0
     game_scope.score = score
     --Player cars
 
-    --Left car
+    -- Left car
     local left_car_object = left_car:new()
     game_scope.left_car_object = left_car_object
     left_car_object:spawn()
@@ -186,9 +191,26 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
- 
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+         
+        local game_loop_timer = timer.performWithDelay( 1000,  
+            function()
+                time_counter = time_counter + 1
+                if(time_counter % generate_time == 0) then
+                    print("Okay generated")
+                    local shape = shapes:new({xPos =swidth/2, yPos=-50, type="circle"})
+                    shape:spawn();
+                    sceneGroup:insert(shape.shape)
+                end
+                -- if(time_counter == 5) then
+                --         time_counter = 0
+                --         generate_time = 1
+                -- end 
+            end
+        ,-1)
+        game_scope.game_loop_timer = game_loop_timer
     end
 end
  

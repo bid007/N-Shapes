@@ -1,7 +1,7 @@
 local soundTable=require("soundTable")
 local physics = require("physics")
 
-local Car = {xPos = 0, yPos = 0, imgFile = "car.png", tag = "car"}
+local Car = {xPos = 0, yPos = 0, imgFile = "car48.png", tag = "car"}
 
 function Car:new (o)    --constructor
   o = o or {}
