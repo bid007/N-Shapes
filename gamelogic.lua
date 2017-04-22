@@ -1,5 +1,6 @@
 local composer = require( "composer") 
 local scene = composer.newScene()
+local widget = require("widget")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -9,6 +10,20 @@ local scene = composer.newScene()
  local road_w = 160
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
+function pause_event(event)
+    -- body
+    print("pause tapped")
+    return true
+end
+
+function right_road_event(event)
+    print("Right road tapped")
+end
+
+function left_road_event(event)
+    print("left road tapped")
+end
+
 -- -----------------------------------------------------------------------------------
  
 -- create()
@@ -23,6 +38,7 @@ function scene:create( event )
     left_road.anchorY = 0
     left_road.y = -60
     game_scope.left_road = left_road
+    left_road:addEventListener( "tap", left_road_event)
     --Right road image
     local right_road = display.newImageRect( sceneGroup, "right.png", road_w, road_h)
     right_road.anchorX = 0
@@ -30,6 +46,25 @@ function scene:create( event )
     right_road.y = -60
     right_road.x = road_w
     game_scope.right_road = right_road
+    right_road:addEventListener( "tap", right_road_event)
+    --Pause button
+    local pause = widget.newButton(
+         {
+            left = swidth/1.15,
+            top = -40, 
+            defaultFile = "pause.png",
+            width = 24,
+            height = 24,
+        }
+    )
+    game_scope.pause = pause
+    pause:addEventListener( "tap", pause_event)
+    sceneGroup:insert(pause)
+    --score value
+    local score = display.newText( sceneGroup, 0, 10, -45, native.systemFontBold, 28)
+    score.anchorY = 0
+    score.anchorX = 0
+    game_scope.score = score
 end
  
  

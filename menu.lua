@@ -84,13 +84,13 @@ function scene:create( event )
     sound_off:addEventListener( "tap", sound_on_event )
     sceneGroup:insert(sound_off)
 
-    --- remove this. Just for check ---
-    local test_img = display.newImage(game_sprites, math.random(1,24))
-    sceneGroup:insert(test_img)
-    test_img:scale(0.4,0.4)
-    test_img.anchorX = 0; test_img.anchorY = 0;
-    test_img.x = math.random(20, 200);test_img.y = math.random(20, 200)
-    --- remove this ---
+    -- --- remove this. Just for check ---
+    -- local test_img = display.newImage(game_sprites, math.random(1,24))
+    -- sceneGroup:insert(test_img)
+    -- test_img:scale(0.4,0.4)
+    -- test_img.anchorX = 0; test_img.anchorY = 0;
+    -- test_img.x = math.random(20, 200);test_img.y = math.random(20, 200)
+    -- --- remove this ---
 end
  
  
