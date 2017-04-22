@@ -38,7 +38,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         timer.performWithDelay( 500, 
             function()
-                local options = {effect = "fade", time = 200}
+                local options = {effect = "fade", time = 500}
                 composer.gotoScene("menu", options)
             end
         )

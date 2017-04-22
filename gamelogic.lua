@@ -1,6 +1,7 @@
 local composer = require( "composer") 
 local scene = composer.newScene()
 local widget = require("widget")
+local car = require("car")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -65,6 +66,11 @@ function scene:create( event )
     score.anchorY = 0
     score.anchorX = 0
     game_scope.score = score
+    --Player cars
+    local left_car = car:new({xPos=swidth/2, yPos=sheight/1.12})
+    game_scope.left_car = left_car
+    left_car:spawn()
+    sceneGroup:insert(left_car.shape)
 end
  
  

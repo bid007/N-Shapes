@@ -27,7 +27,7 @@ function Shapes:spawn()
 	end
 	self.shape.pp = self --pointer to parent
 	self.shape.tag = self.tag
-	physics.addBody(self.shape, "kinematic")
+	physics.addBody(self.shape, "dynamic")
 end
 
 function Shapes:move()
