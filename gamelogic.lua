@@ -6,7 +6,7 @@ local physics = require("physics")
 local shapes = require("shapes")
 physics.start()
 physics.setGravity( 0, 9.8 )
--- physics.setDrawMode( "debug" )
+-- physics.setDrawMode( "hybrid" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -103,7 +103,8 @@ function left_car:spawn()
     self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
     self.shape.tag = self.tag
     self.shape.pp = self
-    physics.addBody( self.shape, "kinematic")
+    local image_outline = graphics.newOutline(2, self.imgFile, 1)
+    physics.addBody( self.shape, "kinematic", {outline = image_outline})
 
     local function event_listener(event)
         transition.to( self.shape, {time=200, x = event.xPos, y = event.yPos})
@@ -117,7 +118,8 @@ function right_car:spawn()
     self.shape = display.newImage(self.imgFile, self.xPos, self.yPos)
     self.shape.tag = self.tag
     self.shape.pp = self
-    physics.addBody( self.shape, "kinematic")
+    local image_outline = graphics.newOutline(2, self.imgFile, 1)
+    physics.addBody( self.shape, "kinematic", {outline = image_outline})
 
     local function event_listener(event)
         transition.to( self.shape, {time=200, x = event.xPos, y = event.yPos})
@@ -200,7 +202,7 @@ function scene:show( event )
                 time_counter = time_counter + 1
                 if(time_counter % generate_time == 0) then
                     print("Okay generated")
-                    local shape = shapes:new({xPos =swidth/2, yPos=-50, type="circle"})
+                    local shape = shapes:new({xPos =swidth/2+20, yPos=-50, type="round_rect"})
                     shape:spawn();
                     sceneGroup:insert(shape.shape)
                 end

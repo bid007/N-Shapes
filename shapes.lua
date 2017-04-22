@@ -12,27 +12,38 @@ end
 
 function Shapes:spawn()
 	local type_obtained = self.type
+	local index = nil
 	if (type_obtained == "circle") then
-		self.shape = display.newImage(game_sprites, math.random(1,4))
+		index = math.random(1,4)
+		self.shape = display.newImage(game_sprites, index)
 	elseif(type_obtained == "round_rect") then
-		self.shape = display.newImage(game_sprites, math.random(5,8))
+		index = math.random(5,8)
+		self.shape = display.newImage(game_sprites, index)
 	elseif(type_obtained == "rect") then
-		self.shape = display.newImage(game_sprites, math.random(9,12))
+		index = math.random(9,12)
+		self.shape = display.newImage(game_sprites, index)
 	elseif(type_obtained == "pentagon") then
-		self.shape = display.newImage(game_sprites, math.random(13,16))
+		index = math.random(13,16)
+		self.shape = display.newImage(game_sprites, index)
 	elseif(type_obtained == "hexagon") then
-		self.shape = display.newImage(game_sprites, math.random(17,20))
+		index = math.random(17,20)
+		self.shape = display.newImage(game_sprites, index)
 	elseif(type_obtained == "triangle") then
-		self.shape = display.newImage(game_sprites, math.random(21, 24))
+		index = math.random(21,24)
+		self.shape = display.newImage(game_sprites, index)
 	end
+	local image_outline = graphics.newOutline(2, game_sprites, index)
 	self.shape.pp = self --pointer to parent
 	self.shape.tag = self.tag
-	self.shape:scale( 0.4, 0.4 )
-	self.shape.x = self.xPos
-	self.shape.y = self.yPos
 	self.shape.anchorX = 0
 	self.shape.anchorY = 0
-	physics.addBody(self.shape, "dynamic")
+	self.shape.width = self.shape.width/3
+	self.shape.height = self.shape.height/3
+	self.shape.x = self.xPos
+	self.shape.y = self.yPos
+
+	
+	physics.addBody(self.shape, "dynamic", {outline = image_outline, density=1000})
 end
 
 function Shapes:move()
