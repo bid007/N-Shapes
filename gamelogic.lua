@@ -105,13 +105,14 @@ function left_road_event(event)
 end
 
 function game_end(event)
-    print("Okay lets finish the game Up")
     if(game_scope.game_loop_timer ~= nil) then
         timer.cancel(game_scope.game_loop_timer)
         if(sound_on) then
             audio.stop(game_scope.car_sound)
             audio.play(soundtable["gameoverSound"], {channel=4})
         end
+        -- local options = {effect = "fade", time = 100}
+        -- composer.gotoScene("end", options)
     end
 end
 Runtime:addEventListener("end", game_end)
@@ -267,7 +268,6 @@ function scene:show( event )
                     shape:handle_collision_with_other(to_avoid_shape)
                     shape.shape:setLinearVelocity( 0, 150 )
                     sceneGroup:insert(shape.shape)
-
                 end
                 -- if(time_counter == 5) then
                 --         time_counter = 0
