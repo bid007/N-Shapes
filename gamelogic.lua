@@ -5,8 +5,8 @@ local car = require("car")
 local physics = require("physics")
 local shapes = require("shapes")
 physics.start()
-physics.setGravity( 0, 9.8 )
--- physics.setDrawMode( "hybrid" )
+physics.setGravity( 0, 0 )
+-- physics.setDrawMode( "hybrid")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -43,11 +43,17 @@ physics.setGravity( 0, 9.8 )
 --Time Counter
 local time_counter = 0 
 local generate_time = 2
+--Shape types index map
+local shape_array = {"Circle", "Rectangle", "Pentagon", "Hexagon", "Triangle"}
+local to_avoid_shape = shape_array[math.random(1,5)]
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function pause_event(event)
     -- body
     print("pause tapped")
+    physics.pause()
+    local options = {effect = "fade", time = 500}
+    composer.gotoScene("menu", options)
     return true
 end
 
@@ -95,6 +101,21 @@ function left_road_event(event)
         Runtime:dispatchEvent(event_dict)
     end
 end
+
+function game_end(event)
+    print("Okay lets finish the game Up")
+    if(game_scope.game_loop_timer ~= nil) then
+        timer.cancel(game_scope.game_loop_timer)
+    end
+end
+Runtime:addEventListener("end", game_end)
+
+function update_score(event)
+    if(game_scope.score ~= nil) then
+        game_scope.score.text = game_scope.score.text + 1
+    end
+end
+Runtime:addEventListener("update_score", update_score)
 --------------------------------------------------------------------------------------
 --Car inheritence methods 
 local left_car = car:new(left_car_pos[0])
@@ -134,7 +155,6 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    display.setDefault( "background", 37/255, 51/255, 122/255)
     --Left road image
     local left_road = display.newImageRect( sceneGroup, "left.png", road_w, road_h)
     left_road.anchorX = 0
@@ -142,6 +162,7 @@ function scene:create( event )
     left_road.y = -60
     game_scope.left_road = left_road
     left_road:addEventListener( "tap", left_road_event)
+
     -- --Right road image
     local right_road = display.newImageRect( sceneGroup, "right.png", road_w, road_h)
     right_road.anchorX = 0
@@ -151,6 +172,7 @@ function scene:create( event )
     game_scope.right_road = right_road
     right_road:toBack()
     right_road:addEventListener( "tap", right_road_event)
+
     --Pause button
     local pause = widget.newButton(
          {
@@ -164,13 +186,14 @@ function scene:create( event )
     game_scope.pause = pause
     pause:addEventListener( "tap", pause_event)
     sceneGroup:insert(pause)
+
     -- --score value
     local score = display.newText( sceneGroup, 0, 10, -45, native.systemFontBold, 28)
     score.anchorY = 0
     score.anchorX = 0
     game_scope.score = score
-    --Player cars
 
+    --Player cars
     -- Left car
     local left_car_object = left_car:new()
     game_scope.left_car_object = left_car_object
@@ -182,6 +205,15 @@ function scene:create( event )
     game_scope.right_car_object = right_car_object
     right_car_object:spawn()
     sceneGroup:insert(right_car_object.shape)
+
+    --Bottom rect 
+    local bottom_rect = display.newRect( sceneGroup, 0, sheight-10, swidth, 50)
+    bottom_rect.anchorX = 0
+    bottom_rect.anchorY = 0
+    bottom_rect.isVisible = false
+    physics.addBody( bottom_rect)
+    bottom_rect.isSensor = true
+    bottom_rect.tag = "bottom_rect"
 end
  
  
@@ -190,27 +222,49 @@ function scene:show( event )
 
     local sceneGroup = self.view
     local phase = event.phase
- 
+    display.setDefault( "background", 37/255, 51/255, 122/255)
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-
+        physics.start()
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-         
-        local game_loop_timer = timer.performWithDelay( 1000,  
+        
+        local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/3, sheight/8, native.systemFontBold, 20)
+        avoid_msg_txt.anchorY = 0
+        avoid_msg_txt.anchorX = 0
+        game_scope.avoid_msg_txt = avoid_msg_txt
+
+        local text_show_timer = timer.performWithDelay( 1000,
+            function()
+                if(game_scope.avoid_msg_txt ~= nil) then
+                    avoid_msg_txt:removeSelf()
+                end
+            end
+        ,1) 
+
+        local game_loop_timer = timer.performWithDelay( 1000, 
+
             function()
                 time_counter = time_counter + 1
+
                 if(time_counter % generate_time == 0) then
-                    print("Okay generated")
-                    local shape = shapes:new({xPos =swidth/2+20, yPos=-50, type="round_rect"})
+
+                    local shape_type = shape_array[math.random(1,5)]
+                    local shape_pos = math.random(0,1)
+                    local x = right_car_pos[shape_pos].xPos
+                    local shape = shapes:new({xPos = x-20, yPos=-50, type=shape_type})
                     shape:spawn();
+                    shape:handle_collision_with_other(to_avoid_shape)
+                    shape.shape:setLinearVelocity( 0, 150 )
                     sceneGroup:insert(shape.shape)
+
                 end
                 -- if(time_counter == 5) then
                 --         time_counter = 0
                 --         generate_time = 1
                 -- end 
             end
+
         ,-1)
         game_scope.game_loop_timer = game_loop_timer
     end

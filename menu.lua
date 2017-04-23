@@ -36,8 +36,6 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    --set background color
-    display.setDefault("background", 242/255, 109/255, 33/255)
     --N Shapes text
     local nshapes_text = display.newText( sceneGroup, "N-Shapes", swidth/2, sheight/9, native.systemFontBold, 30)
     nshapes_text:setFillColor( 0.1, 0.1, 0.1)
@@ -83,14 +81,6 @@ function scene:create( event )
     sound_off.isEnabled = false
     sound_off:addEventListener( "tap", sound_on_event )
     sceneGroup:insert(sound_off)
-
-    -- --- remove this. Just for check ---
-    -- local test_img = display.newImage(game_sprites, math.random(1,24))
-    -- sceneGroup:insert(test_img)
-    -- test_img:scale(0.4,0.4)
-    -- test_img.anchorX = 0; test_img.anchorY = 0;
-    -- test_img.x = math.random(20, 200);test_img.y = math.random(20, 200)
-    -- --- remove this ---
 end
  
  
@@ -99,7 +89,8 @@ function scene:show( event )
 
     local sceneGroup = self.view
     local phase = event.phase
-
+    --set background color
+    display.setDefault("background", 242/255, 109/255, 33/255)
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then

@@ -13,25 +13,37 @@ end
 function Shapes:spawn()
 	local type_obtained = self.type
 	local index = nil
-	if (type_obtained == "circle") then
+	if (type_obtained == "Circle") then
 		index = math.random(1,4)
 		self.shape = display.newImage(game_sprites, index)
+		self.shape.name = "Circle"
+
 	elseif(type_obtained == "round_rect") then
 		index = math.random(5,8)
 		self.shape = display.newImage(game_sprites, index)
-	elseif(type_obtained == "rect") then
+		self.shape.name = "round_rect"
+
+	elseif(type_obtained == "Rectangle") then
 		index = math.random(9,12)
 		self.shape = display.newImage(game_sprites, index)
-	elseif(type_obtained == "pentagon") then
+		self.shape.name = "Rectangle"
+
+	elseif(type_obtained == "Pentagon") then
 		index = math.random(13,16)
 		self.shape = display.newImage(game_sprites, index)
-	elseif(type_obtained == "hexagon") then
+		self.shape.name = "Pentagon"
+
+	elseif(type_obtained == "Hexagon") then
 		index = math.random(17,20)
 		self.shape = display.newImage(game_sprites, index)
-	elseif(type_obtained == "triangle") then
+		self.shape.name = "Hexagon"
+
+	elseif(type_obtained == "Triangle") then
 		index = math.random(21,24)
 		self.shape = display.newImage(game_sprites, index)
+		self.shape.name = "Triangle"
 	end
+
 	local image_outline = graphics.newOutline(2, game_sprites, index)
 	self.shape.pp = self --pointer to parent
 	self.shape.tag = self.tag
@@ -43,18 +55,33 @@ function Shapes:spawn()
 	self.shape.y = self.yPos
 
 	
-	physics.addBody(self.shape, "dynamic", {outline = image_outline, density=1000})
+	physics.addBody(self.shape, "dynamic", {outline = image_outline, bounce = 0})
 end
 
 function Shapes:move()
 	transition.to(self.shape, {time = 2000, x = self.xPos, y = display.contentHeight * 1.2})
 end
 
-function Shapes:handle_collision_with_other()
+function Shapes:handle_collision_with_other(to_avoid_shape)
 	local function collision(event)
 		if(event.phase == "began") then
 			if(self ~= nil and self.shape ~= nil and event.other ~= nil ) then
-				print("do stuffs on collision with player.")
+
+				print(to_avoid_shape)
+				print(event.target.name)
+
+				if(event.other.tag == 'bottom_rect' and event.target.name ~= to_avoid_shape) then
+					print("The game ends")
+					Runtime:dispatchEvent( {name="end"} )
+					return
+				end
+
+				if(event.other.tag == 'car' and event.target.name ~= to_avoid_shape) then
+					Runtime:dispatchEvent({name="update_score"})
+				end
+
+				event.target:removeSelf()
+				event.target = nil
 			end
 		end
 	end
