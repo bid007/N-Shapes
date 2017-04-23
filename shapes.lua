@@ -67,23 +67,16 @@ function Shapes:handle_collision_with_other(to_avoid_shape)
 		if(event.phase == "began") then
 			if(self ~= nil and self.shape ~= nil and event.other ~= nil ) then
 
-				print(to_avoid_shape)
-				print(event.target.name)
-
-				if(event.other.tag == 'bottom_rect' and event.target.name ~= to_avoid_shape) then
-					print("The game ends")
-					if(sound_on) then
-						audio.play(soundTable["explosionSound"], {channel = 2})
-					end
-					Runtime:dispatchEvent( {name="end"} )
-					return
-				end
-
 				if(event.other.tag == 'car' and event.target.name ~= to_avoid_shape) then
 					if(sound_on) then
 						audio.play(soundTable["pickupSound"], {channel = 3})
 					end
 					Runtime:dispatchEvent({name="update_score"})
+				else
+					if(sound_on) then
+						audio.play(soundTable["explosionSound"], {channel = 2})
+					end
+					Runtime:dispatchEvent( {name="end"} )
 				end
 
 				event.target:removeSelf()
