@@ -13,6 +13,7 @@ physics.setGravity( 0, 0 )
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
  local game_scope = {}
+ game_scope.shapes = {}
  local road_h = 630
  local road_w = 160
  --Left car positions
@@ -47,12 +48,33 @@ local generate_time = 2
 --Shape types index map
 local shape_array = {"Circle", "Rectangle", "Pentagon", "Hexagon", "Triangle"}
 local to_avoid_shape = shape_array[math.random(1,5)]
+--function to generate shapes
+function generate_shape(pos, sceneGroup, to_avoid_shape)
+    local pos_dict = nil
+
+    if(pos == "left") then
+        pos_dict = left_car_pos
+    else
+        pos_dict = right_car_pos
+    end
+
+    local shape_type = shape_array[math.random(1,5)]
+    local shape_pos = math.random(0,1)
+    local x = pos_dict[shape_pos].xPos
+    local shape = shapes:new({xPos = x-20, yPos=-50, type=shape_type})
+    shape:spawn();
+    shape:handle_collision_with_other(to_avoid_shape)
+    shape.shape:setLinearVelocity( 0, 150 )
+    sceneGroup:insert(shape.shape)
+    table.insert( game_scope.shapes, shape)
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function pause_event(event)
     -- body
     print("pause tapped")
     physics.pause()
+    timer.pause(game_scope.game_loop_timer)
     audio.pause(game_scope.car_sound)
     local options = {effect = "fade", time = 500}
     composer.gotoScene("menu", options)
@@ -105,24 +127,28 @@ function left_road_event(event)
 end
 
 function game_end(event)
-    if(game_scope.game_loop_timer ~= nil) then
+
+    print("La sakyo hai game yo chahi")
+
+     if(game_scope.game_loop_timer ~= nil) then
         timer.cancel(game_scope.game_loop_timer)
-        if(sound_on) then
-            audio.stop(game_scope.car_sound)
-            audio.play(soundtable["gameoverSound"], {channel=4})
-        end
-        -- local options = {effect = "fade", time = 100}
-        -- composer.gotoScene("end", options)
     end
+
+    if(sound_on) then
+        audio.stop(game_scope.car_sound)
+        audio.play(soundtable["gameoverSound"], {channel=4})
+    end
+
+    local options = {effect = "fade", time = 100, params = {score = game_scope.score.text}}
+    composer.gotoScene("end", options)
+    composer.removeScene( "gamelogic", false)
 end
-Runtime:addEventListener("end", game_end)
 
 function update_score(event)
-    if(game_scope.score ~= nil) then
+    if(game_scope.score ~= nil and game_scope.score.text ~= nil) then
         game_scope.score.text = game_scope.score.text + 1
     end
 end
-Runtime:addEventListener("update_score", update_score)
 --------------------------------------------------------------------------------------
 --Car inheritence methods 
 local left_car = car:new(left_car_pos[0])
@@ -221,6 +247,25 @@ function scene:create( event )
     physics.addBody( bottom_rect)
     bottom_rect.isSensor = true
     bottom_rect.tag = "bottom_rect"
+
+    --Adding runtime event listener
+    Runtime:addEventListener("end", game_end)
+    Runtime:addEventListener("update_score", update_score)
+
+    --First time to avoid text
+    local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/3, sheight/8, native.systemFontBold, 20)
+    avoid_msg_txt.anchorY = 0
+    avoid_msg_txt.anchorX = 0
+    game_scope.avoid_msg_txt = avoid_msg_txt
+
+    local text_show_timer = timer.performWithDelay( 1000,
+            function()
+                if(game_scope.avoid_msg_txt ~= nil) then
+                    avoid_msg_txt:removeSelf()
+                end
+            end
+    ,1) 
+    game_scope.text_show_timer = text_show_timer
 end
  
  
@@ -235,23 +280,11 @@ function scene:show( event )
         physics.start()
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        
-        local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/3, sheight/8, native.systemFontBold, 20)
-        avoid_msg_txt.anchorY = 0
-        avoid_msg_txt.anchorX = 0
-        game_scope.avoid_msg_txt = avoid_msg_txt
-
+        print("is sound on", sound_on)
         if(sound_on) then
             game_scope.car_sound = audio.play(soundtable["carSound"], {loops = -1, channel=1}) -- loop forever
+             audio.resume(1)
         end
-
-        local text_show_timer = timer.performWithDelay( 1000,
-            function()
-                if(game_scope.avoid_msg_txt ~= nil) then
-                    avoid_msg_txt:removeSelf()
-                end
-            end
-        ,1) 
 
         local game_loop_timer = timer.performWithDelay( 1000, 
 
@@ -259,15 +292,8 @@ function scene:show( event )
                 time_counter = time_counter + 1
 
                 if(time_counter % generate_time == 0) then
-
-                    local shape_type = shape_array[math.random(1,5)]
-                    local shape_pos = math.random(0,1)
-                    local x = right_car_pos[shape_pos].xPos
-                    local shape = shapes:new({xPos = x-20, yPos=-50, type=shape_type})
-                    shape:spawn();
-                    shape:handle_collision_with_other(to_avoid_shape)
-                    shape.shape:setLinearVelocity( 0, 150 )
-                    sceneGroup:insert(shape.shape)
+                    generate_shape("left", sceneGroup, to_avoid_shape)
+                    generate_shape("right", sceneGroup, to_avoid_shape)
                 end
                 -- if(time_counter == 5) then
                 --         time_counter = 0
@@ -277,6 +303,7 @@ function scene:show( event )
 
         ,-1)
         game_scope.game_loop_timer = game_loop_timer
+        timer.resume(game_scope.game_loop_timer)
     end
 end
  
@@ -289,9 +316,9 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
- 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
+        audio.stop()
     end
 end
  

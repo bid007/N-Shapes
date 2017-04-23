@@ -66,21 +66,37 @@ function Shapes:handle_collision_with_other(to_avoid_shape)
 	local function collision(event)
 		if(event.phase == "began") then
 			if(self ~= nil and self.shape ~= nil and event.other ~= nil ) then
-
-				if(event.other.tag == 'car' and event.target.name ~= to_avoid_shape) then
-					if(sound_on) then
-						audio.play(soundTable["pickupSound"], {channel = 3})
-					end
-					Runtime:dispatchEvent({name="update_score"})
-				else
+				local function game_over()
 					if(sound_on) then
 						audio.play(soundTable["explosionSound"], {channel = 2})
 					end
 					Runtime:dispatchEvent( {name="end"} )
 				end
 
+				local function update_score()
+					if(sound_on) then
+						audio.play(soundTable["pickupSound"], {channel = 3})
+					end
+					Runtime:dispatchEvent({name="update_score"})
+				end
+
+				local other = event.other.tag
+				local target = event.target.name
+
 				event.target:removeSelf()
-				event.target = nil
+				event.target = nil	
+
+				if(other == "car" and target == to_avoid_shape) then
+					game_over()
+				elseif(other == "car" and target ~= to_avoid_shape) then
+					update_score()
+					print("object removed update score")
+				elseif(other == "bottom_rect" and target ~= to_avoid_shape) then
+					game_over()
+				else
+					print("object removed wall and to avoid object")
+				end
+
 			end
 		end
 	end

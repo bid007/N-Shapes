@@ -37,7 +37,7 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     --N Shapes text
-    local nshapes_text = display.newText( sceneGroup, "N-Shapes", swidth/2, sheight/9, native.systemFontBold, 30)
+    local nshapes_text = display.newText( sceneGroup, "Game Over", swidth/2, sheight/9, native.systemFontBold, 35)
     nshapes_text:setFillColor( 0.1, 0.1, 0.1)
     end_scope.nshapes_text = nshapes_text
     --Play/pause button 
@@ -81,6 +81,11 @@ function scene:create( event )
     sound_off.isEnabled = false
     sound_off:addEventListener( "tap", sound_on_event )
     sceneGroup:insert(sound_off)
+
+    local final_score_text = display.newText( sceneGroup, "", swidth/2, sheight/4, native.systemFontBold,20)
+    final_score_text:setFillColor( 0, 0, 0 )
+    end_scope.final_score_text = final_score_text
+
 end
  
  
@@ -89,6 +94,9 @@ function scene:show( event )
 
     local sceneGroup = self.view
     local phase = event.phase
+    if(event.params ~= nil and event.params.score ~= nil) then
+        end_scope.final_score_text.text = "Score: "..event.params.score
+    end
     --set background color
     display.setDefault("background", 242/255, 109/255, 33/255)
 
