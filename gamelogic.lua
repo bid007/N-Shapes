@@ -4,6 +4,7 @@ local widget = require("widget")
 local car = require("car")
 local physics = require("physics")
 local shapes = require("shapes")
+local soundtable = require("soundTable")
 physics.start()
 physics.setGravity( 0, 0 )
 -- physics.setDrawMode( "hybrid")
@@ -52,6 +53,7 @@ function pause_event(event)
     -- body
     print("pause tapped")
     physics.pause()
+    audio.pause(game_scope.car_sound)
     local options = {effect = "fade", time = 500}
     composer.gotoScene("menu", options)
     return true
@@ -106,6 +108,10 @@ function game_end(event)
     print("Okay lets finish the game Up")
     if(game_scope.game_loop_timer ~= nil) then
         timer.cancel(game_scope.game_loop_timer)
+        if(sound_on) then
+            audio.stop(game_scope.car_sound)
+            audio.play(soundtable["gameoverSound"], {channel=4})
+        end
     end
 end
 Runtime:addEventListener("end", game_end)
@@ -233,6 +239,10 @@ function scene:show( event )
         avoid_msg_txt.anchorY = 0
         avoid_msg_txt.anchorX = 0
         game_scope.avoid_msg_txt = avoid_msg_txt
+
+        if(sound_on) then
+            game_scope.car_sound = audio.play(soundtable["carSound"], {loops = -1, channel=1}) -- loop forever
+        end
 
         local text_show_timer = timer.performWithDelay( 1000,
             function()
