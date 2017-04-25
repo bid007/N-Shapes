@@ -49,8 +49,8 @@ function Shapes:spawn()
 	self.shape.tag = self.tag
 	self.shape.anchorX = 0
 	self.shape.anchorY = 0
-	self.shape.width = self.shape.width/3
-	self.shape.height = self.shape.height/3
+	self.shape.width = self.shape.width/2.5
+	self.shape.height = self.shape.height/2.5
 	self.shape.x = self.xPos
 	self.shape.y = self.yPos
 
