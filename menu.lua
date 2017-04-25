@@ -91,6 +91,19 @@ function scene:show( event )
     local phase = event.phase
     --set background color
     display.setDefault("background",  0.1, 0.2, 0.5)
+
+    if(sound_on) then
+        menu_scope.sound_on.isVisible = true
+        menu_scope.sound_on.isEnabled = true
+        menu_scope.sound_off.isVisible = false
+        menu_scope.sound_off.isEnabled = false
+    else
+        menu_scope.sound_on.isVisible = false
+        menu_scope.sound_on.isEnabled = false
+        menu_scope.sound_off.isVisible = true
+        menu_scope.sound_off.isEnabled = true
+    end
+
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then
