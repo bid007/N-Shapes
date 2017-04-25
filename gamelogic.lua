@@ -139,9 +139,17 @@ function game_end(event)
         audio.play(soundtable["gameoverSound"], {channel=4})
     end
 
-    local options = {effect = "fade", time = 100, params = {score = game_scope.score.text}}
-    composer.gotoScene("end", options)
-    composer.removeScene( "gamelogic", false)
+    physics.pause(); --added later 
+    local delay_timer = timer.performWithDelay( 1000, 
+        function()
+            --Initially this was the code here
+            --if something wrong happens, remove the physics pause and delay timer 
+            --just keep the below 3 lines of code
+            local options = {effect = "fade", time = 100, params = {score = game_scope.score.text}}
+            composer.gotoScene("end", options)
+            composer.removeScene( "gamelogic", false)
+        end
+    ,1)
 end
 
 function update_score(event)
