@@ -38,7 +38,7 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
     --N Shapes text
     local nshapes_text = display.newText( sceneGroup, "Game Over", swidth/2, sheight/9, native.systemFontBold, 35)
-    nshapes_text:setFillColor( 0.1, 0.1, 0.1)
+    nshapes_text:setFillColor( 0.9, 0.9, 0.9)
     end_scope.nshapes_text = nshapes_text
     --Play/pause button 
     local replay = widget.newButton( 
@@ -83,7 +83,7 @@ function scene:create( event )
     sceneGroup:insert(sound_off)
 
     local final_score_text = display.newText( sceneGroup, "", swidth/2, sheight/4, native.systemFontBold,20)
-    final_score_text:setFillColor( 0, 0, 0 )
+    final_score_text:setFillColor( 0.9, 0.9, 0.9 )
     end_scope.final_score_text = final_score_text
 
 end
@@ -98,7 +98,7 @@ function scene:show( event )
         end_scope.final_score_text.text = "Score: "..event.params.score
     end
     --set background color
-    display.setDefault("background", 242/255, 109/255, 33/255)
+    display.setDefault("background",  0.1, 0.2, 0.5)
 
     if(sound_on) then
         end_scope.sound_on.isVisible = true

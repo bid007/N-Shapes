@@ -38,7 +38,7 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
     --N Shapes text
     local nshapes_text = display.newText( sceneGroup, "N-Shapes", swidth/2, sheight/9, native.systemFontBold, 30)
-    nshapes_text:setFillColor( 0.1, 0.1, 0.1)
+    nshapes_text:setFillColor( 0.9, 0.9, 0.9)
     menu_scope.nshapes_text = nshapes_text
     --Play/pause button 
     local play = widget.newButton( 
@@ -90,7 +90,7 @@ function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
     --set background color
-    display.setDefault("background", 242/255, 109/255, 33/255)
+    display.setDefault("background",  0.1, 0.2, 0.5)
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then

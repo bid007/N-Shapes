@@ -47,6 +47,6 @@ local options = {
 sheight = display.contentHeight
 swidth = display.contentWidth
 sound_on = true
-game_sprites = graphics.newImageSheet( "Game Arko without background.png", options );
+game_sprites = graphics.newImageSheet( "sprites_new.png", options );
 -- Go to menu scene
 composer.gotoScene("gamecredit", {effect="fade", time=1000})
