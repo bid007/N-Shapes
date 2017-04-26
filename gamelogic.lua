@@ -61,7 +61,7 @@ function generate_shape(pos, sceneGroup, to_avoid_shape)
     local shape_type = shape_array[math.random(1,5)]
     local shape_pos = math.random(0,1)
     local x = pos_dict[shape_pos].xPos
-    local shape = shapes:new({xPos = x-20, yPos=-50, type=shape_type})
+    local shape = shapes:new({xPos = x-20, yPos=-math.random( 50, 200), type=shape_type})
     shape:spawn();
     shape:handle_collision_with_other(to_avoid_shape)
     shape.shape:setLinearVelocity( 0, 150 )
