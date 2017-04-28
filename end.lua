@@ -1,11 +1,44 @@
 local composer = require( "composer") 
 local scene = composer.newScene()
 local widget = require("widget")
+local sqlite3 = require("sqlite3")
+local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+local db = sqlite3.open( path )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
  local end_scope = {}
+--------------------------------------------------------------------------------------
+--create table for score
+local tablesetup = [[CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY autoincrement, description, score);]]
+db:exec( tablesetup )
+--save best score in db
+function save_score(score)
+    local desc = "best_score"
+    local q = [[INSERT INTO test VALUES (NULL, ']] .. desc .. [[',']] .. score .. [[');]]
+    db:exec( q )
+    print("score saved")
+end
+--Update any new best score
+function update_score(score)
+    print("this called")
+    local q = [[UPDATE test SET score=']]..score..[[' WHERE description = "best_score";]]
+    db:exec( q )
+    print("score updated")
+end
+--Retrieve previous best score
+function retrieve_score()
+
+    for row in db:nrows("SELECT * FROM test") do
+        if(row.description == "best_score") then
+            print("score retrieved")
+            return row.score
+        end
+    end
+    print("No score saved yet")
+    return nil
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 function replay_event(event)
@@ -86,6 +119,10 @@ function scene:create( event )
     final_score_text:setFillColor( 0.9, 0.9, 0.9 )
     end_scope.final_score_text = final_score_text
 
+    local best_score_text = display.newText( sceneGroup, "", swidth/2, sheight/5, native.systemFontBold,20)
+    best_score_text:setFillColor( 0.9, 0.9, 0.9 )
+    end_scope.best_score_text = best_score_text
+
 end
  
  
@@ -95,6 +132,33 @@ function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
     if(event.params ~= nil and event.params.score ~= nil) then
+        local score = event.params.score
+        local db_score = retrieve_score()
+     
+        if(db_score == nil) then
+            save_score(score)
+        else
+            print("score : ", score)
+            print("Db score : ", db_score)
+            db_score = tostring(db_score)
+            score = tostring(score)
+            
+            local db_score_int = tonumber(db_score)
+            local score_int = tonumber(score)
+
+            if(db_score_int >= score_int) then
+                print("Db score is greater")
+                end_scope.best_score_text.text = "Best Score: "..db_score
+            else
+                print("Current score is greater")
+                local q = [[UPDATE test SET score=']]..score..[[' WHERE description = "best_score";]]
+                db:exec( q )
+                end_scope.best_score_text.text = "**New Best Score: "..score
+                -- update_score(score)
+            end
+        end
+        
+
         end_scope.final_score_text.text = "Score: "..event.params.score
     end
     --set background color

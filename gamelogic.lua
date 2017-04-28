@@ -45,11 +45,11 @@ physics.setGravity( 0, 0 )
 --Time Counter
 local time_counter = 0 
 local generate_time = 2
---Shape types index map
-local shape_array = {"Circle", "Rectangle", "Pentagon", "Hexagon", "Triangle"}
-local to_avoid_shape = shape_array[math.random(1,5)]
+local avoid_shape_timer = 0
+local new_avoid_time = 30
+local initial_velocity = 150
 --function to generate shapes
-function generate_shape(pos, sceneGroup, to_avoid_shape)
+function generate_shape(pos, sceneGroup, velocity)
     local pos_dict = nil
 
     if(pos == "left") then
@@ -63,8 +63,8 @@ function generate_shape(pos, sceneGroup, to_avoid_shape)
     local x = pos_dict[shape_pos].xPos
     local shape = shapes:new({xPos = x-20, yPos=-math.random( 50, 200), type=shape_type})
     shape:spawn();
-    shape:handle_collision_with_other(to_avoid_shape)
-    shape.shape:setLinearVelocity( 0, 150 )
+    shape:handle_collision_with_other()
+    shape.shape:setLinearVelocity( 0, velocity)
     sceneGroup:insert(shape.shape)
     table.insert( game_scope.shapes, shape)
 end
@@ -259,21 +259,6 @@ function scene:create( event )
     --Adding runtime event listener
     Runtime:addEventListener("end", game_end)
     Runtime:addEventListener("update_score", update_score)
-
-    --First time to avoid text
-    local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/3, sheight/8, native.systemFontBold, 20)
-    avoid_msg_txt.anchorY = 0
-    avoid_msg_txt.anchorX = 0
-    game_scope.avoid_msg_txt = avoid_msg_txt
-
-    local text_show_timer = timer.performWithDelay( 1000,
-            function()
-                if(game_scope.avoid_msg_txt ~= nil) then
-                    avoid_msg_txt:removeSelf()
-                end
-            end
-    ,1) 
-    game_scope.text_show_timer = text_show_timer
 end
  
  
@@ -288,25 +273,74 @@ function scene:show( event )
         physics.start()
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        print("is sound on", sound_on)
         if(sound_on) then
             game_scope.car_sound = audio.play(soundtable["carSound"], {loops = -1, channel=1}) -- loop forever
              audio.resume(1)
         end
+        --Generate new shape to avoid
+        function new_avoid_shape()
+            local new_shape = shape_array[math.random(1,5)];
+            if(new_shape == to_avoid_shape) then
+                new_avoid_shape()
+            end
+            return new_shape
+        end
+        to_avoid_shape = new_avoid_shape()
+        --First time to avoid text
+        local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/2 - 100, sheight/8, native.systemFontBold, 30)
+        avoid_msg_txt.anchorY = 0
+        avoid_msg_txt.anchorX = 0
+        game_scope.avoid_msg_txt = avoid_msg_txt
+
+        local text_show_timer = timer.performWithDelay( 1000,
+                function()
+                    if(game_scope.avoid_msg_txt ~= nil) then
+                        avoid_msg_txt:removeSelf()
+                    end
+                end
+        ,1) 
+        game_scope.text_show_timer = text_show_timer
 
         local game_loop_timer = timer.performWithDelay( 1000, 
 
             function()
                 time_counter = time_counter + 1
+                avoid_shape_timer = avoid_shape_timer + 1
 
-                if(time_counter % generate_time == 0) then
-                    generate_shape("left", sceneGroup, to_avoid_shape)
-                    generate_shape("right", sceneGroup, to_avoid_shape)
+                if(initial_velocity < 250) then
+                    initial_velocity = initial_velocity + 1.5;
                 end
-                -- if(time_counter == 5) then
-                --         time_counter = 0
-                --         generate_time = 1
-                -- end 
+
+                if(time_counter == generate_time) then
+                    generate_shape("left", sceneGroup, initial_velocity)
+                    generate_shape("right", sceneGroup, initial_velocity)
+                    time_counter = 0;
+                end
+
+                if(avoid_shape_timer == new_avoid_time) then
+                    --Pause the timer to allow some time for forbidden objects go away
+                    timer.pause(game_scope.game_loop_timer)
+                    --Get new distinct shape
+                     to_avoid_shape = new_avoid_shape()
+                    --Display to avoid shape information
+                    local avoid_msg_txt = display.newText(sceneGroup, "Avoid "..to_avoid_shape, swidth/6 , sheight/8, native.systemFontBold, 30)
+                    avoid_msg_txt.anchorY = 0
+                    avoid_msg_txt.anchorX = 0
+                    game_scope.avoid_msg_txt = avoid_msg_txt
+
+                    local text_show_timer = timer.performWithDelay( 1000,
+                            function()
+                                timer.resume(game_scope.game_loop_timer)
+                                if(game_scope.avoid_msg_txt ~= nil) then
+                                    avoid_msg_txt:removeSelf()
+                                end
+                            end
+                    ,1) 
+                    game_scope.text_show_timer = text_show_timer
+
+                    avoid_shape_timer = 0
+                end
+
             end
 
         ,-1)

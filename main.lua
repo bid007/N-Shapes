@@ -48,5 +48,8 @@ sheight = display.contentHeight
 swidth = display.contentWidth
 sound_on = true
 game_sprites = graphics.newImageSheet( "sprites_new.png", options );
+--Shape types index map
+shape_array = {"Circle", "Rectangle", "Pentagon", "Hexagon", "Triangle"}
+to_avoid_shape = shape_array[math.random(1,5)]
 -- Go to menu scene
 composer.gotoScene("gamecredit", {effect="fade", time=1000})

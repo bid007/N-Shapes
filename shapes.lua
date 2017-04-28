@@ -62,7 +62,7 @@ function Shapes:move()
 	transition.to(self.shape, {time = 2000, x = self.xPos, y = display.contentHeight * 1.2})
 end
 
-function Shapes:handle_collision_with_other(to_avoid_shape)
+function Shapes:handle_collision_with_other()
 	local function collision(event)
 		if(event.phase == "began") then
 			if(self ~= nil and self.shape ~= nil and event.other ~= nil ) then
