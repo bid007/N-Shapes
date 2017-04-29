@@ -295,7 +295,7 @@ function scene:show( event )
         local text_show_timer = timer.performWithDelay( 1000,
                 function()
                     if(game_scope.avoid_msg_txt ~= nil) then
-                        avoid_msg_txt:removeSelf()
+                        game_scope.avoid_msg_txt:removeSelf()
                     end
                 end
         ,1) 
